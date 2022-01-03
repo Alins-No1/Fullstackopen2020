@@ -3,16 +3,16 @@ const CreateNewBlogForm = (props) => (
   <div>
     <form onSubmit={props.createNewBlogHandler}>
       <div>
-        title:<input type="text" onChange={props.blogTitleChangeHandler} />
+        title:<input id='titleValue' type="text" onChange={props.blogTitleChangeHandler} />
       </div>
       <div>
-        author:<input type="text" onChange={props.blogAuthorChangeHandler} />
+        author:<input id='authorValue' type="text" onChange={props.blogAuthorChangeHandler} />
       </div>
       <div>
-        url:<input type="text" onChange={props.blogURLChangeHandler} />
+        url:<input id='urlValue' type="text" onChange={props.blogURLChangeHandler} />
       </div>
       <div>
-        <button type="submit">create</button>
+        <button id='createNewBlogButton' type="submit">create</button>
       </div>
     </form>
   </div>

@@ -6,24 +6,24 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import userService from './services/user'
 
-const Notification = ({ message, type }) => 
-  message && message != ' ' ?
-  <div className={type}>
-    {message}
-  </div>
-  : null
+const Notification = ({ message, type }) =>
+  message && message !== ' ' ?
+    <div className={type}>
+      {message}
+    </div>
+    : null
 
 const LoginForm = (props) => (
   <div>
     <form onSubmit={props.loginHandler}>
       <div>
-        username <input type="text" onChange={props.usernameChangeHandler} />
+        username <input id='usernameValue' type="text" onChange={props.usernameChangeHandler} />
       </div>
       <div>
-        password <input type="password" onChange={props.passwordChangeHandler} />
+        password <input id='passwordValue' type="password" onChange={props.passwordChangeHandler} />
       </div>
       <div>
-        <button type="submit">login</button>
+        <button id='loginButton' type="submit">login</button>
       </div>
     </form>
   </div>
@@ -39,7 +39,7 @@ const BlogsForm = (props) => {
           <button type="submit">logout</button>
         </div>
       </form>
-    
+
       <h2>{props.createNewHeading}</h2>
       <Togglable buttonLabel='create new blog' ref={props.createNewRef}>
         <CreateNewBlogForm
@@ -49,7 +49,7 @@ const BlogsForm = (props) => {
           createNewBlogHandler={props.createNewBlogHandler}
         />
       </Togglable>
-   
+
       {props.blogs.map(blog =>
         <Blog
           key={blog.id}
@@ -73,7 +73,7 @@ const App = () => {
   const [ notificationMessage, setNotificationMessage ] = useState(null)
   const [ notificationType, setNotificationType ] = useState('success')
   const createNewBlogFormRef = useRef()
-  
+
   useEffect(() => {
     const activeUserRawData = window.localStorage.getItem('BlogListActiveUser')
     if (activeUserRawData)
@@ -97,16 +97,16 @@ const App = () => {
       return () => clearTimeout(timer)
     }
   }, [ notificationMessage ])
-  
+
   const handleLogin = async event => {
     event.preventDefault()
-    
+
     const user = await userService.login({ username, password })
     if (user) {
       const currentActiveUser = {
-        "id": user.id,
-        "name": user.name,
-        "token": `bearer ${user.token}`
+        'id': user.id,
+        'name': user.name,
+        'token': `bearer ${user.token}`
       }
       window.localStorage.setItem('BlogListActiveUser', JSON.stringify(currentActiveUser))
       setActiveUser(currentActiveUser)
@@ -150,11 +150,11 @@ const App = () => {
 
     if (activeUser) {
       var newBlog = {
-        "user": activeUser.id,
-        "likes": blog.likes + 1,
-        "title": blog.title,
-        "author": blog.author,
-        "url": blog.url
+        'user': activeUser.id,
+        'likes': blog.likes + 1,
+        'title': blog.title,
+        'author': blog.author,
+        'url': blog.url
       }
 
       const updatedBlog = await blogService.addLike(blog.id, newBlog, activeUser.token)
@@ -171,9 +171,9 @@ const App = () => {
 
   const handleRemoveBlog = async (blog, event) => {
     event.preventDefault()
-    
+
     if (activeUser)
-      if (activeUser.id == blog.user.id) {
+      if (activeUser.id === blog.user.id) {
         if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
           const removed = await blogService.remove(blog.id, activeUser.token)
           if (removed.error) {

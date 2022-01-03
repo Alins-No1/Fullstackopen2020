@@ -100,4 +100,13 @@ blogsRouter.delete('/blogs/:id', async (request, response) => {
     await response.status(204).end()
 })
 
+blogsRouter.post('/testing/reset', async (request, response) => {
+  if (process.env.NODE_ENV === 'test') {
+    await Blog.deleteMany({})
+    await User.deleteMany({})
+    await response.status(204).end()
+  } else
+    await response.status(403).json({ error: 'database reset only allowed in test mone' })
+})
+
 module.exports = blogsRouter

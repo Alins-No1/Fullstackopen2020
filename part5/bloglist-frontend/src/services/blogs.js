@@ -8,7 +8,7 @@ const getAll = () => {
 
 const getOwn = async userId => {
   const response = await axios.get(baseUrl)
-  return response.data.filter(blog => blog.user.id == userId)
+  return response.data.filter(blog => blog.user.id === userId)
 }
 
 const createNew = async (newBlog, token) => {
@@ -17,18 +17,18 @@ const createNew = async (newBlog, token) => {
       baseUrl,
       newBlog,
       {
-        'headers': {'Authorization': token}
+        'headers': { 'Authorization': token }
       }
     )
     return response.data
   } catch (e) {
     if (e.response)
-      if (e.response.status == 400)
-        return { "error": "both title and url were empty" }
+      if (e.response.status === 400)
+        return { 'error': 'both title and url were empty' }
       else
-        return { "error": e.response.data.error}
+        return { 'error': e.response.data.error }
     else
-      return { "error": "unknown error" }
+      return { 'error': 'unknown error' }
   }
 }
 
@@ -38,20 +38,20 @@ const addLike = async (blogId, newBlog, token) => {
       `${baseUrl}/${blogId}`,
       newBlog,
       {
-        'headers': {'Authorization': token}
+        'headers': { 'Authorization': token }
       }
     )
     return response.data
   } catch (e) {
     if (e.response)
-      if (e.response.status == 404)
-        return { "error": `blog id ${blogId} not found` }
-      else if (e.response.status == 500)
-        return { "error": "unknown internal server error" }
+      if (e.response.status === 404)
+        return { 'error': `blog id ${blogId} not found` }
+      else if (e.response.status === 500)
+        return { 'error': 'unknown internal server error' }
       else
-        return { "error": e.response.data.error }
+        return { 'error': e.response.data.error }
     else
-      return { "error": "unknown error" }
+      return { 'error': 'unknown error' }
   }
 }
 
@@ -60,18 +60,18 @@ const remove = async (blogId, token) => {
     const response = await axios.delete(
       `${baseUrl}/${blogId}`,
       {
-        'headers': {'Authorization': token}
+        'headers': { 'Authorization': token }
       }
     )
     return response.data
   } catch (e) {
     if (e.response)
-      if (e.response.status == 500)
-        return { "error": "unknown internal server error" }
+      if (e.response.status === 500)
+        return { 'error': 'unknown internal server error' }
       else
-        return { "error": e.response.data.error }
+        return { 'error': e.response.data.error }
     else
-      return { "error": "unknown error" }
+      return { 'error': 'unknown error' }
   }
 }
 
