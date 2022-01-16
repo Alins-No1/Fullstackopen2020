@@ -1,48 +1,34 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { logout } from '../reducers/activeUserReducer'
-import { clearBlogs } from '../reducers/blogsReducer'
 import { setNotification } from '../reducers/notificationReducer'
-import Blog from './Blog'
 import CreateNewBlogForm from './CreateNewBlogForm'
 import Notification from './Notification'
 
-const BlogsForm = () => {
+const BlogsForm = ({ blogs }) => {
   const activeUser = useSelector(state => state.activeUser.user)
-  const blogs = useSelector(state => state.blogs.blogs)
   const dispatch = useDispatch()
 
-  const handleLogout = event => {
-    event.preventDefault()
-
-    dispatch(setNotification(
-      `${activeUser.name} logged out`,
-      'success', 3
-    ))
-    dispatch(logout())
-    dispatch(clearBlogs())
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
   }
 
   if (activeUser)
     return (
       <div>
-        <h2>Blogs</h2>
         <Notification />
-        <form onSubmit={handleLogout}>
-          <div>
-            {activeUser.name} logged in
-            <button type='submit'>logout</button>
-          </div>
-        </form>
-
-        <h2>create new</h2>
         <CreateNewBlogForm />
-
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+        {blogs.map(blog => <div key={blog.id} style={blogStyle}>
+          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+        </div>)}
       </div>
     )
   else
-    dispatch(setNotification('not logged in', 'error', 3))
+    dispatch(setNotification('not logged in', 'danger', 3))
 }
 
 export default BlogsForm

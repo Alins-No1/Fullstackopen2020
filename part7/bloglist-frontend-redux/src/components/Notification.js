@@ -1,14 +1,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import './Notification.css'
+import { Alert } from 'react-bootstrap'
 
 const Notification = () => {
   const notification = useSelector(state => state.notification)
   return (
     notification && notification.message && notification.message !== ' ' ?
-      <div className={notification.type}>
+      <Alert variant={notification.type}>
         {notification.message}
-      </div>
+      </Alert>
       : null
   )
 }

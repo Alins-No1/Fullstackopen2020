@@ -1,16 +1,23 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 
 blogsRouter.get('/blogs', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+  const blogs = await
+    Blog.find({})
+        .populate('user', { username: 1, name: 1 })
+        .populate('comments', { text: 1 })
   await response.json(blogs)
 })
 
 blogsRouter.get('/blogs/:id', async (request, response) => {
   const id = request.params.id
 
-  const blog = await Blog.findById(id).populate('user', { username: 1, name: 1 })
+  const blog = await
+    Blog.findById(id)
+        .populate('user', { username: 1, name: 1 })
+        .populate('comments', { text: 1 })
   if (blog)
     await response.status(200).json(blog)
   else
@@ -28,6 +35,7 @@ blogsRouter.post('/blogs', async (request, response) => {
         blogMeta.user = request.user
         if (blogMeta.likes === undefined)
           blogMeta.likes = 0
+        blogMeta.comments = []
 
         const blog = await new Blog(blogMeta)
         const result = await blog.save()
@@ -60,7 +68,10 @@ blogsRouter.put('/blogs/:id', async (request, response) => {
               likes: blogMeta.likes ? blogMeta.likes : oldBlog.likes
             })
     
-            const newBlog = await Blog.findById(id)
+            const newBlog = await
+              Blog.findById(id)
+                  .populate('user', { username: 1, name: 1 })
+                  .populate('comments', { text: 1 })
             await response.status(201).json(newBlog)
           } catch (e) {
             await response.status(500).end()
@@ -84,6 +95,8 @@ blogsRouter.delete('/blogs/:id', async (request, response) => {
       if (request.user)
         if (blog.user.toString() === request.user._id.toString())
           try {
+            for (let commentId of blog.comments)
+              await Comment.findById(commentId).remove()
             const result = await blog.remove()
             await response.status(204).json(result)
           } catch (e) {
@@ -100,8 +113,35 @@ blogsRouter.delete('/blogs/:id', async (request, response) => {
     await response.status(204).end()
 })
 
+blogsRouter.post('/blogs/:id/comments', async (request, response) => {
+  const id = request.params.id
+  const blog = await Blog.findById(id)
+  if (blog) {
+    const commentText = request.body.text
+    if (commentText)
+      try {
+        const comment = await new Comment({
+          'text': commentText,
+          'blog': blog
+        })
+        const newComment = await comment.save()
+        blog.comments = blog.comments.concat(newComment._id)
+        let updatedBlog = await blog.save()
+        updatedBlog = await updatedBlog.populate('comments', { text: 1 }).execPopulate()
+        await response.status(201).json(updatedBlog)
+      } catch (e) {
+        await response.status(500).end()
+        throw e
+      }
+    else
+      await response.status(400).json({ error: 'no comment provided or provided comment is empty' })
+  } else
+    await response.status(404).end()
+})
+
 blogsRouter.post('/testing/reset', async (request, response) => {
   if (process.env.NODE_ENV === 'test') {
+    await Comment.deleteMany({})
     await Blog.deleteMany({})
     await User.deleteMany({})
     await response.status(204).end()

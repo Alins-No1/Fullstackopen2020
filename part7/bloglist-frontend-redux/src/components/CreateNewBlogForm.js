@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Button } from 'react-bootstrap'
 import { useField } from '../hooks'
 import { createNew } from '../reducers/blogsReducer'
 import { setNotification } from '../reducers/notificationReducer'
@@ -17,7 +18,7 @@ const CreateNewBlogForm = () => {
 
   useEffect(() => {
     if (blogsError)
-      dispatch(setNotification(blogsError, 'error', 3))
+      dispatch(setNotification(blogsError, 'danger', 3))
     else if (blogsSuccess) {
       dispatch(setNotification(blogsSuccess, 'success', 3))
       newBlogTitle.onReset()
@@ -39,9 +40,9 @@ const CreateNewBlogForm = () => {
       if (newBlogURL.value)
         newBlogMeta['url'] = newBlogURL.value
 
-      dispatch(createNew(newBlogMeta, activeUser.token))
+      dispatch(createNew(activeUser.id, newBlogMeta, activeUser.token))
     } else
-      dispatch(setNotification('not logged in', 'error', 3))
+      dispatch(setNotification('not logged in', 'danger', 3))
   }
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
@@ -50,7 +51,7 @@ const CreateNewBlogForm = () => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button id='buttonOfTogglable' onClick={() => setVisible(true)}>create new blog</button>
+        <Button id='buttonOfTogglable' variant='primary' onClick={() => setVisible(true)}>create new blog</Button>
       </div>
       <div style={showWhenVisible}>
         <form onSubmit={handleCreateNewBlog}>
@@ -64,8 +65,8 @@ const CreateNewBlogForm = () => {
             url:<input {...newBlogURL} />
           </div>
           <div>
-            <button id='createNewBlogButton' type='submit'>create</button>
-            <button id='cancelButtonOfTogglable' type='button' onClick={() => setVisible(false)}>cancel</button>
+            <Button id='createNewBlogButton' variant='primary' type='submit'>create</Button>
+            <Button id='cancelButtonOfTogglable' variant='primary' type='button' onClick={() => setVisible(false)}>cancel</Button>
           </div>
         </form>
       </div>

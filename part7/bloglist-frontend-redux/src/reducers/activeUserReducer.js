@@ -1,4 +1,4 @@
-import userService from '../services/user.js'
+import userService from '../services/user'
 
 const emptyState = {
   'user': null,

@@ -1,9 +1,9 @@
 import axios from 'axios'
 const baseUrl = '/api/blogs'
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
 }
 
 const getOwn = async userId => {
@@ -55,6 +55,28 @@ const addLike = async (blogId, newBlog, token) => {
   }
 }
 
+const addComment = async (blogId, commentText) => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/${blogId}/comments`,
+      {
+        'text': commentText
+      }
+    )
+    return response.data
+  } catch (e) {
+    if (e.response)
+      if (e.response.status === 404)
+        return { 'error': `blog id ${blogId} not found` }
+      else if (e.response.status === 500)
+        return { 'error': 'unknown internal server error' }
+      else
+        return { 'error': e.response.data.error }
+    else
+      return { 'error': 'unknown error' }
+  }
+}
+
 const remove = async (blogId, token) => {
   try {
     const response = await axios.delete(
@@ -75,4 +97,4 @@ const remove = async (blogId, token) => {
   }
 }
 
-export default { getAll, getOwn, createNew, addLike, remove }
+export default { getAll, getOwn, createNew, addLike, addComment, remove }

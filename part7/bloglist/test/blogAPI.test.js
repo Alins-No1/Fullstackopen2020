@@ -3,6 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 const bcrypt = require('bcrypt')
 require('express-async-errors')
 
@@ -77,6 +78,29 @@ const existedUsers = [
   }
 ]
 
+const existedComments = [
+  {
+    _id: "168f80a91e60ff243876bbfa",
+    text: "The first comment",
+    blog: "5a422a851b54a676234d17f7"
+  },
+  {
+    _id: "168f81a93e60ff243876bbfb",
+    text: "The second comment",
+    blog: "5a422b3a1b54a676234d17f9"
+  },
+  {
+    _id: "168f83a97e60ff243876bbfc",
+    text: "The third comment",
+    blog: "5a422b891b54a676234d17fa"
+  },
+  {
+    _id: "168f87a9fe60ff243876bbfd",
+    text: "The fourth comment",
+    blog: "5a422b891b54a676234d17fa"
+  }
+]
+
 var token = null
 
 describe('blog API', () => {
@@ -93,11 +117,21 @@ describe('blog API', () => {
 
     await Blog.deleteMany({})
     for (var blogMeta of existedBlogs) {
+      blogMeta.comments = []
       const newBlog = new Blog(blogMeta)
       const result = await newBlog.save()
       const user = await User.findById(blogMeta.user)
       user.blogs = user.blogs.concat(result._id)
       await user.save()
+    }
+
+    await Comment.deleteMany({})
+    for (var commentMeta of existedComments) {
+      const newComment = new Comment(commentMeta)
+      const result = await newComment.save()
+      const blog = await Blog.findById(commentMeta.blog)
+      blog.comments = blog.comments.concat(result._id)
+      await blog.save()
     }
 
     const loggedIn =
@@ -125,6 +159,15 @@ describe('blog API', () => {
     const returnedBlogs = response.body;
     expect(returnedBlogs.length).toBeGreaterThan(0)
     expect(returnedBlogs[0].id).toBeDefined()
+  }, 1000000)
+
+  test('a blog with the correct numbers of comments', async() => {
+    const blogId = "5a422b891b54a676234d17fa"
+    const response = await api.get(`/api/blogs/${blogId}`)
+    expect(response.status).toBe(200)
+
+    const returnedBlog = response.body
+    expect(returnedBlog.comments.length).toBe(2)
   }, 1000000)
 
   test('posting a new blog', async () => {
@@ -162,6 +205,20 @@ describe('blog API', () => {
       .post('/api/blogs')
       .send(newBlog)
       .expect(401)
+  }, 1000000)
+
+  test ('add a comment to an existed blog', async() => {
+    const newComment = {
+      _id: "168f8ea90e60ff243876bbfe",
+      text: "The fifth comment"
+    }
+    const blogId = "5a422ba71b54a676234d17fb"
+
+    const response = await api
+      .post(`/api/blogs/${blogId}/comments`)
+      .send(newComment)
+    expect(response.status).toBe(201)
+    expect(response.body.comments.length).toBe(1)
   }, 1000000)
 
   test('new blog\'s \'likes\' set default 0 if missing', async () => {

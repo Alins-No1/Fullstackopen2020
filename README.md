@@ -1,5 +1,9 @@
-# Full Stack Open Courses
+# Full Stack Open Courses 2020-2022
 ### https://fullstackopen.com/
-### All exercises of part 0-6 except 2.14 and 5.16
-### Exercises 7.1-7.12 of part 7
+
+## Progress
+### 2020 Version (until Jan. 2021)
+- All exercises of part 0-3 done, except 2.14
+### 2021 Version (until Jan. 2022)
+- All exercises of part 4-7 done, except 5.16, 7.19 and 7.20
 

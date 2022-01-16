@@ -25,8 +25,9 @@ usersRouter.post('/users', async (request, response) => {
 
   try {
     const user = new User(userMeta)
-    const result = await user.save()
-    await response.status(201).json(result)
+    let newUser = await user.save()
+    newUser = await newUser.populate('blogs', { title: 1, url: 1, author: 1 }).execPopulate()
+    await response.status(201).json(newUser)
   } catch (e) {
     const errors = e.errors;
     var result = "";

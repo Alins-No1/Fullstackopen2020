@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Button } from 'react-bootstrap'
 import { useField } from '../hooks'
 import { login } from '../reducers/activeUserReducer'
-import { initialize } from '../reducers/blogsReducer'
+import { setOwnBlogs } from '../reducers/blogsReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import Notification from './Notification'
 
@@ -16,11 +17,11 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (activeUserError)
-      dispatch(setNotification(activeUserError, 'error', 3))
+      dispatch(setNotification(activeUserError, 'danger', 3))
     else if (activeUser) {
       username.onReset()
       password.onReset()
-      dispatch(initialize(activeUser.id))
+      dispatch(setOwnBlogs(activeUser.id))
     }
   }, [ activeUser, activeUserError ])
 
@@ -42,7 +43,7 @@ const LoginForm = () => {
           password <input {...password} />
         </div>
         <div>
-          <button id='loginButton' type='submit'>login</button>
+          <Button id='loginButton' variant='primary' type='submit'>login</Button>
         </div>
       </form>
     </div>
